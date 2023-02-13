@@ -1,15 +1,23 @@
 package com.example.springdemo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="users")
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String email;
+    private String password;
 
     public String getEmail() {
         return email;
@@ -23,18 +31,11 @@ public class User {
         return password;
     }
 
+
+
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public User(Long id,String email, String password) {
-        this.id =id;
-        this.email = email;
-        this.password = password;
-    }
-
-    private String email;
-    private String password;
 
 
     public void setId(Long id) {

@@ -28,7 +28,7 @@ public class BookListRequestIntegrationTest {
     }
 
     @Test
-    void shouldReturn200WhenSendingRequestToLoginApi() throws Exception {
+    void shouldReturn200WhenSendingRequestToBookListApi() throws Exception {
         mockMvc.perform(get("/task/books")
                         .contentType(MediaType.APPLICATION_JSON)  )
                 .andExpect(status().isOk());
