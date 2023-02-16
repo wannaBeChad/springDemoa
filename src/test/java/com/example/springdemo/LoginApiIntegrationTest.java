@@ -22,7 +22,7 @@ class LoginApiIntegrationTest {
     void shouldReturn200WhenSendingRequestToLoginApi() throws Exception {
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"John@adc.com\",\"password\":\"asd\"}"))
+                        .content("{\"email\":\"test1@check24.de\",\"password\":\"asd\"}"))
                 .andExpect(status().isOk());
     }
 

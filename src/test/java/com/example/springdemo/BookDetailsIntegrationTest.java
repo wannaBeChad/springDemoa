@@ -1,7 +1,7 @@
 package com.example.springdemo;
 
 import com.example.springdemo.dto.BookDto;
-import com.example.springdemo.service.BookService;
+import com.example.springdemo.dto.BookPlusSimilarDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,31 +16,30 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class BookListRequestIntegrationTest {
+public class BookDetailsIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     private ObjectMapper mapper = new ObjectMapper();
 
 
-
-    @Test
-    void shouldReturn200WhenSendingRequestToBookListApi() throws Exception {
-        String json = mockMvc.perform(get("/task/books")
+    @Test()
+    void shouldReturn200WhenSendingRequestToBookDetailsApi() throws Exception {
+        String json = mockMvc.perform(put("/task/book/b2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn()
                 .getResponse()
                 .getContentAsString();
-     List<BookDto> values = mapper.readValue(json, new TypeReference<List<BookDto>>(){});
-        assertThat(values).hasSize(3);
-        assertThat(values.get(0).getId().equals("b1"));
+        BookPlusSimilarDto values = mapper.readValue(json, new TypeReference<BookPlusSimilarDto>(){});
+        assertThat(values.getBookDto().getId()).isEqualTo("b2");
+        assertThat(values.getSimilarBooks().get(0).getKey()).isEqualTo("b1");
+
 
     }
 }

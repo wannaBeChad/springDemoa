@@ -16,14 +16,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Lazy
 @Service
 public class ViewService {
-    public Map<String, Map<String, Object>> matrix = new HashMap<>();
+    public Map<String, Map<String, Double>> matrix = new HashMap<>();
 
     @Autowired
     private final ViewRepository viewRepository;
@@ -60,15 +58,37 @@ public class ViewService {
             throw new RuntimeException();
         }
     }
+    public static List<Map.Entry<String, Double>> getTopEntries(HashMap<String, Double> map, int n, String bookId) {
+        List<Map.Entry<String, Double>> list = new ArrayList<>(map.entrySet());
+        list.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
+        return list.stream().filter(entry->!entry.getKey().equals(bookId)).toList().subList(0, n);
+    }
 
+    public List<Map.Entry<String, Double>> getTopNSortedListOfCosineSimScores(String bookId,int n){
+        return getTopEntries(makeCosineSim(bookId),n,bookId);
+    }
 
-    public void generateMatrix() {
+    private HashMap<String, Double> makeCosineSim(String bookId){
+        generateMatrix();
+        List<Book> allBooks =bookRepository.findAll();
+        List<String> allBookIds =allBooks.stream().map(book -> book.getId()).toList();
+        HashMap<String, Double> similaritiesForBook = new HashMap<>();
+        for (String currentBookId:allBookIds) {
+            if (currentBookId!=bookId) {
+                similaritiesForBook.put(currentBookId,CosineSimilarityService.cosineSimilarity(matrix.get(bookId),matrix.get(currentBookId)));
+            }
+        }
+        return similaritiesForBook;
+    }
+
+    private Map<String, Map<String, Double>> generateMatrix() {
         List<Book> listOfBooks = bookRepository.findAll();
         List<User> listOfUsers = userService.getAllUsers();
         for (User user:listOfUsers) {
             for (Book book:listOfBooks)
-                putValue(user.getEmail(),book.getId(),getUserBookPairCount(book.getId(),user.getId()));
+                putValue(book.getId(),user.getEmail(), (double) getUserBookPairCount(book.getId(),user.getId()));
         }
+        return matrix;
     }
 
     private View viewCsvDtoToViewConverter(ViewCsvDto dto) {
@@ -81,8 +101,8 @@ public class ViewService {
     private int getUserBookPairCount(String bookId, Long userId){
         return viewRepository.getUserBookPairCount(bookId,userId);
     }
-    private void putValue(String row, String col, Integer value) {
-        Map<String, Object> rowData = matrix.get(row);
+    private void putValue(String row, String col, Double value) {
+        Map<String, Double> rowData = matrix.get(row);
         if (rowData == null) {
             rowData = new HashMap<>();
             matrix.put(row, rowData);
@@ -90,12 +110,12 @@ public class ViewService {
         rowData.put(col, value);
     }
 
-    private Integer getValue(String row, String col) {
-        Map<String, Object> rowData = matrix.get(row);
+    private Double getValue(String row, String col) {
+        Map<String, Double> rowData = matrix.get(row);
         if (rowData == null) {
             return null;
         }
-        return (Integer) rowData.get(col);
+        return (Double) rowData.get(col);
     }
 
 
