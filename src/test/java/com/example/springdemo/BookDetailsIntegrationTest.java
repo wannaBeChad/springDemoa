@@ -31,12 +31,13 @@ public class BookDetailsIntegrationTest {
 
     @Test()
     void shouldReturn200WhenSendingRequestToBookDetailsApi() throws Exception {
-        String json = mockMvc.perform(put("/task/book/b2")
+        String json = mockMvc.perform(put("/task/book/b2").param("email", "test1@check24.de")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn()
                 .getResponse()
                 .getContentAsString();
-        BookPlusSimilarDto values = mapper.readValue(json, new TypeReference<BookPlusSimilarDto>(){});
+        BookPlusSimilarDto values = mapper.readValue(json, new TypeReference<BookPlusSimilarDto>() {
+        });
         assertThat(values.getBookDto().getId()).isEqualTo("b2");
         assertThat(values.getSimilarBooks().get(0).getKey()).isEqualTo("b1");
 

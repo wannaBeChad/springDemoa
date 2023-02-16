@@ -27,8 +27,8 @@ public class bookController {
     }
 
     @PutMapping("/task/book/{bookId}")
-    public BookPlusSimilarDto viewBook(@PathVariable String bookId /*,@RequestParam String email*/) throws BookNotFoundException {
-        bookService.incrementView(bookId,"test1@check24.de");
+    public BookPlusSimilarDto viewBook(@PathVariable String bookId ,@RequestParam String email) throws BookNotFoundException {
+        bookService.incrementView(bookId,email);
         List<Map.Entry<String, Double>> similarList = viewService.getTopNSortedListOfCosineSimScores(bookId,2);
         BookDto bookDto= bookService.fetchBookById(bookId);
 
